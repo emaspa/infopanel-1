@@ -68,12 +68,12 @@ namespace InfoPanel
                         _maxSectors = 38;
                         break;
                     case TuringPanel.TuringPanelModel.REV_13INCH_USB:
-                        _screenType = ScreenType.RevisionA;
-                        _sectorWidth = 20;
-                        _sectorHeight = 20;
-                        _maxSectorWidth = 40;
-                        _maxSectorHeight = 40;
-                        _maxSectors = 76;
+                        _screenType = ScreenType.RevisionE;
+                        _sectorWidth = 32;
+                        _sectorHeight = 32;
+                        _maxSectorWidth = 128;
+                        _maxSectorHeight = 96;
+                        _maxSectors = 38;
                         break;
                     default:
                         throw new ArgumentException($"Unsupported TuringPanel model: {modelInfo.Model}", nameof(device));
@@ -110,7 +110,7 @@ namespace InfoPanel
             await Task.Delay(300, token);
             try
             {
-                using var screen = ScreenFactory.Create(_screenType, _device.DeviceLocation);
+                using var screen = ScreenFactory.Create(_screenType, _device.DeviceLocation, _panelWidth, _panelHeight);
 
                 if (screen == null)
                 {
