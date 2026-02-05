@@ -60,7 +60,6 @@ namespace InfoPanel
                         break;
                     case TuringPanel.TuringPanelModel.REV_8INCH:
                     case TuringPanel.TuringPanelModel.REV_2INCH:
-                    case TuringPanel.TuringPanelModel.REV_13INCH_USB:
                         _screenType = ScreenType.RevisionE;
                         _sectorWidth = 32;
                         _sectorHeight = 32;
