@@ -90,40 +90,12 @@ namespace InfoPanel.TuringPanel
                     var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort");
                     var serialPorts = searcher.Get().Cast<ManagementObject>().ToList();
 
-                    // Check for CT13INCH identifier port (VID_1A86&PID_CA11)
-                    // When present, skip the companion 0525:A4A7 serial port — the CT13INCH
-                    // uses USB protocol and is discovered by GetUsbDevices() instead
-                    bool hasCt13Inch = serialPorts.Any(obj =>
-                    {
-                        string? pnp = obj["PNPDeviceID"]?.ToString();
-                        return pnp != null && pnp.Contains("VID_1A86") && pnp.Contains("PID_CA11");
-                    });
-
-                    if (hasCt13Inch)
-                    {
-                        Logger.Information("Detected CT13INCH identifier port, skipping 0525:A4A7 in serial discovery");
-                    }
-
                     foreach (ManagementObject queryObj in serialPorts)
                     {
                         string? comPort = queryObj["DeviceID"]?.ToString();
                         string? pnpDeviceId = queryObj["PNPDeviceID"]?.ToString();
                         if (comPort == null || pnpDeviceId == null || !TryParseVidPid(pnpDeviceId, out var vid, out var pid))
                         {
-                            continue;
-                        }
-
-                        // Skip CT13INCH identifier port
-                        if (vid == 0x1a86 && pid == 0xca11)
-                        {
-                            continue;
-                        }
-
-                        // Skip companion 0525:A4A7 port when CT13INCH is present —
-                        // it's handled via USB protocol, not serial
-                        if (hasCt13Inch && vid == 0x0525 && pid == 0xa4a7)
-                        {
-                            Logger.Information("Skipping companion port {ComPort} (belongs to CT13INCH)", comPort);
                             continue;
                         }
 
