@@ -92,6 +92,19 @@ namespace InfoPanel.TuringPanel
 
                 if (_device is IUsbDevice wholeUsbDevice)
                 {
+                    // Log all available endpoints for debugging
+                    for (int iface = 0; iface < wholeUsbDevice.Configs[0].InterfaceInfoList.Count; iface++)
+                    {
+                        var ifaceInfo = wholeUsbDevice.Configs[0].InterfaceInfoList[iface];
+                        Logger.Information("Interface {Index}: InterfaceID={Id}, EndpointCount={Count}",
+                            iface, ifaceInfo.Descriptor.InterfaceID, ifaceInfo.EndpointInfoList.Count);
+                        foreach (var ep in ifaceInfo.EndpointInfoList)
+                        {
+                            Logger.Information("  Endpoint: Address=0x{Address:X2}, MaxPacketSize={MaxPacket}, Attributes=0x{Attr:X2}",
+                                ep.Descriptor.EndpointID, ep.Descriptor.MaxPacketSize, ep.Descriptor.Attributes);
+                        }
+                    }
+
                     wholeUsbDevice.SetConfiguration(1);
                     wholeUsbDevice.ClaimInterface(0);
                 }
