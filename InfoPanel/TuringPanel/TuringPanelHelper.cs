@@ -90,33 +90,17 @@ namespace InfoPanel.TuringPanel
                     var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort");
                     var serialPorts = searcher.Get().Cast<ManagementObject>().ToList();
 
-                    // Find CT13INCH identifier port (VID_1A86&PID_CA11) — this is both
-                    // the identifier and communication port for the TURZX 13" panel
-                    string? ct13InchComPort = null;
-                    string? ct13InchPnpDeviceId = null;
-                    foreach (ManagementObject obj in serialPorts)
+                    // Check for CT13INCH identifier port (VID_1A86&PID_CA11)
+                    // which indicates a companion 0525:A4A7 port is a 13" panel, not an 8.8"
+                    bool hasCt13Inch = serialPorts.Any(obj =>
                     {
                         string? pnp = obj["PNPDeviceID"]?.ToString();
-                        if (pnp != null && pnp.Contains("VID_1A86") && pnp.Contains("PID_CA11"))
-                        {
-                            ct13InchComPort = obj["DeviceID"]?.ToString();
-                            ct13InchPnpDeviceId = pnp;
-                            break;
-                        }
-                    }
+                        return pnp != null && pnp.Contains("VID_1A86") && pnp.Contains("PID_CA11");
+                    });
 
-                    if (ct13InchComPort != null)
+                    if (hasCt13Inch)
                     {
-                        Logger.Information("Detected CT13INCH on {ComPort}", ct13InchComPort);
-
-                        TuringPanelDevice device = new()
-                        {
-                            DeviceId = ct13InchPnpDeviceId!,
-                            DeviceLocation = ct13InchComPort,
-                            Model = TuringPanelModel.REV_13INCH_USB.ToString()
-                        };
-
-                        devices.Add(device);
+                        Logger.Information("Detected CT13INCH identifier port, 0525:A4A7 port will be identified as TURZX 13\"");
                     }
 
                     foreach (ManagementObject queryObj in serialPorts)
@@ -128,17 +112,9 @@ namespace InfoPanel.TuringPanel
                             continue;
                         }
 
-                        // Skip CT13INCH identifier port (handled above)
+                        // Skip the CT13INCH identifier port — communication happens on the companion 0525:A4A7 port
                         if (vid == 0x1a86 && pid == 0xca11)
                         {
-                            continue;
-                        }
-
-                        // Skip the companion 0525:A4A7 port when CT13INCH is present —
-                        // it belongs to the 13" panel, not a separate 8.8" Rev 1.0
-                        if (ct13InchComPort != null && vid == 0x0525 && pid == 0xa4a7)
-                        {
-                            Logger.Information("Skipping companion port {ComPort} (belongs to CT13INCH)", comPort);
                             continue;
                         }
 
@@ -146,13 +122,22 @@ namespace InfoPanel.TuringPanel
                         {
                             if (kv.Value.VendorId == vid && kv.Value.ProductId == pid)
                             {
-                                Logger.Information("Found Turing panel device: {Name} on {ComPort}", kv.Value.Name, comPort);
+                                // If CT13INCH identifier is present and this is a 0525:A4A7 port,
+                                // identify it as the 13" panel instead of 8.8" Rev 1.0
+                                var model = kv.Key;
+                                if (hasCt13Inch && vid == 0x0525 && pid == 0xa4a7)
+                                {
+                                    model = TuringPanelModel.REV_13INCH_USB;
+                                }
+
+                                var modelInfo = TuringPanelModelDatabase.Models[model];
+                                Logger.Information("Found Turing panel device: {Name} on {ComPort}", modelInfo.Name, comPort);
 
                                 TuringPanelDevice device = new()
                                 {
                                     DeviceId = pnpDeviceId,
                                     DeviceLocation = comPort,
-                                    Model = kv.Key.ToString()
+                                    Model = model.ToString()
                                 };
 
                                 devices.Add(device);
