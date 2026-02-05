@@ -90,6 +90,19 @@ namespace InfoPanel.TuringPanel
                     var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort");
                     var serialPorts = searcher.Get().Cast<ManagementObject>().ToList();
 
+                    // Check for CT13INCH identifier port (VID_1A86&PID_CA11)
+                    // When present, the companion 0525:A4A7 port is a 13" panel, not an 8.8"
+                    bool hasCt13Inch = serialPorts.Any(obj =>
+                    {
+                        string? pnp = obj["PNPDeviceID"]?.ToString();
+                        return pnp != null && pnp.Contains("VID_1A86") && pnp.Contains("PID_CA11");
+                    });
+
+                    if (hasCt13Inch)
+                    {
+                        Logger.Information("Detected CT13INCH identifier port");
+                    }
+
                     foreach (ManagementObject queryObj in serialPorts)
                     {
                         string? comPort = queryObj["DeviceID"]?.ToString();
@@ -99,17 +112,30 @@ namespace InfoPanel.TuringPanel
                             continue;
                         }
 
+                        // Skip CT13INCH identifier port — not used for communication
+                        if (vid == 0x1a86 && pid == 0xca11)
+                        {
+                            continue;
+                        }
+
                         foreach (var kv in TuringPanelModelDatabase.Models)
                         {
                             if (kv.Value.VendorId == vid && kv.Value.ProductId == pid && !kv.Value.IsUsbDevice)
                             {
-                                Logger.Information("Found Turing panel device: {Name} on {ComPort}", kv.Value.Name, comPort);
+                                var model = kv.Key;
+                                if (hasCt13Inch && vid == 0x0525 && pid == 0xa4a7)
+                                {
+                                    model = TuringPanelModel.REV_13INCH_USB;
+                                }
+
+                                var modelInfo = TuringPanelModelDatabase.Models[model];
+                                Logger.Information("Found Turing panel device: {Name} on {ComPort}", modelInfo.Name, comPort);
 
                                 TuringPanelDevice device = new()
                                 {
                                     DeviceId = pnpDeviceId,
                                     DeviceLocation = comPort,
-                                    Model = kv.Key.ToString()
+                                    Model = model.ToString()
                                 };
 
                                 devices.Add(device);

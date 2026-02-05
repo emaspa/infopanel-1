@@ -90,34 +90,14 @@ namespace InfoPanel.TuringPanel
                 if (!string.IsNullOrEmpty(deviceId))
                     Logger.Debug("Device ID: {DeviceId}", deviceId);
 
-                Logger.Information("Device type: {DeviceType}", _device.GetType().Name);
-
                 if (_device is IUsbDevice wholeUsbDevice)
                 {
-                    Logger.Information("IUsbDevice: ConfigCount={ConfigCount}", wholeUsbDevice.Configs.Count);
-                    for (int iface = 0; iface < wholeUsbDevice.Configs[0].InterfaceInfoList.Count; iface++)
-                    {
-                        var ifaceInfo = wholeUsbDevice.Configs[0].InterfaceInfoList[iface];
-                        Logger.Information("Interface {Index}: InterfaceID={Id}, EndpointCount={Count}",
-                            iface, ifaceInfo.Descriptor.InterfaceID, ifaceInfo.EndpointInfoList.Count);
-                        foreach (var ep in ifaceInfo.EndpointInfoList)
-                        {
-                            Logger.Information("  Endpoint: Address=0x{Address:X2}, MaxPacketSize={MaxPacket}, Attributes=0x{Attr:X2}",
-                                ep.Descriptor.EndpointID, ep.Descriptor.MaxPacketSize, ep.Descriptor.Attributes);
-                        }
-                    }
-
                     wholeUsbDevice.SetConfiguration(1);
                     wholeUsbDevice.ClaimInterface(0);
-                }
-                else
-                {
-                    Logger.Warning("Device is NOT IUsbDevice — cannot enumerate interfaces/endpoints");
                 }
 
                 _reader = _device.OpenEndpointReader(ReadEndpointID.Ep01);
                 _writer = _device.OpenEndpointWriter(WriteEndpointID.Ep01);
-                Logger.Information("Opened endpoints: Reader=Ep01, Writer=Ep01");
 
                 if (_reader == null || _writer == null)
                 {
