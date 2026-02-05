@@ -68,12 +68,12 @@ namespace InfoPanel
                         _maxSectors = 38;
                         break;
                     case TuringPanel.TuringPanelModel.REV_13INCH_USB:
-                        _screenType = ScreenType.RevisionC;
+                        _screenType = ScreenType.RevisionA;
                         _sectorWidth = 20;
                         _sectorHeight = 20;
-                        _maxSectorWidth = 120;
-                        _maxSectorHeight = 80;
-                        _maxSectors = 30;
+                        _maxSectorWidth = 40;
+                        _maxSectorHeight = 40;
+                        _maxSectors = 76;
                         break;
                     default:
                         throw new ArgumentException($"Unsupported TuringPanel model: {modelInfo.Model}", nameof(device));
