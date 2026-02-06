@@ -44,8 +44,8 @@ public sealed unsafe class TuringSmartScreenRevisionE : IDisposable
         {
             DtrEnable = true,
             RtsEnable = true,
-            ReadTimeout = 1000,
-            WriteTimeout = 1000,
+            ReadTimeout = 5000,
+            WriteTimeout = 5000,
             BaudRate = 115200,
             StopBits = StopBits.One,
             Parity = Parity.None
