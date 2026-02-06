@@ -21,6 +21,9 @@ namespace InfoPanel
         private readonly int _panelWidth;
         private readonly int _panelHeight;
 
+        private readonly int _nativeWidth;
+        private readonly int _nativeHeight;
+        private readonly ScreenOrientation _screenOrientation;
 
         private readonly int _sectorWidth;
         private readonly int _sectorHeight;
@@ -39,6 +42,9 @@ namespace InfoPanel
             {
                 _panelWidth = modelInfo.Width;
                 _panelHeight = modelInfo.Height;
+                _nativeWidth = modelInfo.Width;
+                _nativeHeight = modelInfo.Height;
+                _screenOrientation = ScreenOrientation.Portrait;
 
                 switch (modelInfo.Model)
                 {
@@ -69,6 +75,9 @@ namespace InfoPanel
                         break;
                     case TuringPanel.TuringPanelModel.REV_13INCH_USB:
                         _screenType = ScreenType.RevisionE;
+                        _nativeWidth = 480;
+                        _nativeHeight = 1920;
+                        _screenOrientation = ScreenOrientation.Landscape;
                         _sectorWidth = 32;
                         _sectorHeight = 32;
                         _maxSectorWidth = 128;
@@ -110,7 +119,7 @@ namespace InfoPanel
             await Task.Delay(300, token);
             try
             {
-                using var screen = ScreenFactory.Create(_screenType, _device.DeviceLocation, _panelWidth, _panelHeight);
+                using var screen = ScreenFactory.Create(_screenType, _device.DeviceLocation, _nativeWidth, _nativeHeight);
 
                 if (screen == null)
                 {
@@ -118,6 +127,7 @@ namespace InfoPanel
                     return;
                 }
 
+                screen.Orientation = _screenOrientation;
                 _device.UpdateRuntimeProperties(isRunning: true);
 
                 screen.ScreenOn();
