@@ -202,34 +202,6 @@ namespace InfoPanel.TuringPanel
             }
         }
 
-        /// <summary>
-        /// Finds the companion SoC control port (0525:A4A7) for the CT13INCH panel.
-        /// </summary>
-        public static string? FindCompanionPort(int vid, int pid)
-        {
-            try
-            {
-                var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort");
-                foreach (ManagementObject queryObj in searcher.Get().Cast<ManagementObject>())
-                {
-                    string? comPort = queryObj["DeviceID"]?.ToString();
-                    string? pnpDeviceId = queryObj["PNPDeviceID"]?.ToString();
-                    if (comPort != null && pnpDeviceId != null && TryParseVidPid(pnpDeviceId, out var v, out var p))
-                    {
-                        if (v == vid && p == pid)
-                        {
-                            return comPort;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Error finding companion port");
-            }
-            return null;
-        }
-
         private static bool TryParseVidPid(string pnpDeviceId, out int vid, out int pid)
         {
             vid = 0;

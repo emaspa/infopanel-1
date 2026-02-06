@@ -119,34 +119,13 @@ namespace InfoPanel
 
             try
             {
-                // For CT13INCH, try the fast CH340 port first, fall back to CDC ACM
-                IScreen? screen = null;
-                if (_device.ModelInfo?.Model == TuringPanel.TuringPanelModel.REV_13INCH_USB)
-                {
-                    var ch340Port = TuringPanel.TuringPanelHelper.FindCompanionPort(0x1a86, 0xca11);
-                    if (ch340Port != null)
-                    {
-                        try
-                        {
-                            screen = ScreenFactory.Create(_screenType, ch340Port, _nativeWidth, _nativeHeight);
-                            Logger.Information("CT13INCH: Connected via CH340 data port {Port}", ch340Port);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Warning(ex, "CT13INCH: CH340 port {Port} failed, falling back to CDC ACM port {FallbackPort}", ch340Port, _device.DeviceLocation);
-                        }
-                    }
-                }
-
-                screen ??= ScreenFactory.Create(_screenType, _device.DeviceLocation, _nativeWidth, _nativeHeight);
+                using var screen = ScreenFactory.Create(_screenType, _device.DeviceLocation, _nativeWidth, _nativeHeight);
 
                 if (screen == null)
                 {
                     Logger.Warning("TuringPanelE: Screen not found on port {Port}", _device.DeviceLocation);
                     return;
                 }
-
-                using var _ = screen;
 
                 screen.Orientation = _screenOrientation;
                 _device.UpdateRuntimeProperties(isRunning: true);
@@ -182,7 +161,6 @@ namespace InfoPanel
                                 sentBitmap = bitmap;
 
                                 canDisplayPartialBitmap = screen.DisplayBuffer(screen.CreateBufferFrom(sentBitmap));
-                                Logger.Information("Full frame update: {ElapsedMs}ms, canPartial={CanPartial}", stopwatch.ElapsedMilliseconds, canDisplayPartialBitmap);
                             }
                             else
                             {
@@ -191,7 +169,6 @@ namespace InfoPanel
                                 if (sectors.Count > _maxSectors)
                                 {
                                     canDisplayPartialBitmap = screen.DisplayBuffer(screen.CreateBufferFrom(bitmap));
-                                    Logger.Information("Too many sectors ({Count}>{Max}), full frame: {ElapsedMs}ms, canPartial={CanPartial}", sectors.Count, _maxSectors, stopwatch.ElapsedMilliseconds, canDisplayPartialBitmap);
                                 }
                                 else
                                 {
@@ -199,8 +176,6 @@ namespace InfoPanel
                                     {
                                         canDisplayPartialBitmap = screen.DisplayBuffer(sector.Left, sector.Top, screen.CreateBufferFrom(bitmap, sector.Left, sector.Top, sector.Width, sector.Height));
                                     }
-
-                                    Logger.Information("Partial update: {Count} sectors, {ElapsedMs}ms, canPartial={CanPartial}", sectors.Count, stopwatch.ElapsedMilliseconds, canDisplayPartialBitmap);
                                 }
                                 sentBitmap?.Dispose();
                                 sentBitmap = bitmap;
