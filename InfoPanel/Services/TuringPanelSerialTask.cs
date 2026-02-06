@@ -182,17 +182,16 @@ namespace InfoPanel
                                 sentBitmap = bitmap;
 
                                 canDisplayPartialBitmap = screen.DisplayBuffer(screen.CreateBufferFrom(sentBitmap));
-                                //Trace.WriteLine($"Full sector update: {stopwatch.ElapsedMilliseconds}ms");
+                                Logger.Information("Full frame update: {ElapsedMs}ms, canPartial={CanPartial}", stopwatch.ElapsedMilliseconds, canDisplayPartialBitmap);
                             }
                             else
                             {
                                 var sectors = SKBitmapComparison.GetChangedSectors(sentBitmap, bitmap, _sectorWidth, _sectorHeight, _maxSectorWidth, _maxSectorHeight);
-                                //Trace.WriteLine($"Sector detect: {sectors.Count} sectors {stopwatch.ElapsedMilliseconds}ms");
 
                                 if (sectors.Count > _maxSectors)
                                 {
                                     canDisplayPartialBitmap = screen.DisplayBuffer(screen.CreateBufferFrom(bitmap));
-                                    //Trace.WriteLine($"Full sector update: {stopwatch.ElapsedMilliseconds}ms");
+                                    Logger.Information("Too many sectors ({Count}>{Max}), full frame: {ElapsedMs}ms, canPartial={CanPartial}", sectors.Count, _maxSectors, stopwatch.ElapsedMilliseconds, canDisplayPartialBitmap);
                                 }
                                 else
                                 {
@@ -201,7 +200,7 @@ namespace InfoPanel
                                         canDisplayPartialBitmap = screen.DisplayBuffer(sector.Left, sector.Top, screen.CreateBufferFrom(bitmap, sector.Left, sector.Top, sector.Width, sector.Height));
                                     }
 
-                                    //Trace.WriteLine($"Sector update: {stopwatch.ElapsedMilliseconds}ms");
+                                    Logger.Information("Partial update: {Count} sectors, {ElapsedMs}ms, canPartial={CanPartial}", sectors.Count, stopwatch.ElapsedMilliseconds, canDisplayPartialBitmap);
                                 }
                                 sentBitmap?.Dispose();
                                 sentBitmap = bitmap;
@@ -222,7 +221,7 @@ namespace InfoPanel
                 }
                 catch (TaskCanceledException)
                 {
-                    Logger.Debug("Task cancelled");
+                    Logger.Information("Task cancelled");
                 }
                 catch (Exception ex)
                 {
