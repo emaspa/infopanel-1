@@ -9,8 +9,6 @@ using System.Threading.Tasks;
 using TuringSmartScreenLib;
 using TuringSmartScreenLib.Helpers.SkiaSharp;
 using System.Diagnostics;
-using System.IO.Ports;
-using InfoPanel.TuringPanel;
 
 namespace InfoPanel
 {
@@ -115,75 +113,11 @@ namespace InfoPanel
             return null;
         }
 
-        /// <summary>
-        /// For dual-port devices (CT13INCH), initialize the SoC control port
-        /// to wake the CH340 data port.
-        /// </summary>
-        private void InitializeCompanionPort()
-        {
-            var companionPort = TuringPanelHelper.FindCompanionPort(0x0525, 0xa4a7);
-            if (companionPort == null)
-            {
-                Logger.Warning("CT13INCH: Companion SoC port (0525:A4A7) not found");
-                return;
-            }
-
-            Logger.Information("CT13INCH: Initializing via companion port {Port}", companionPort);
-            try
-            {
-                using var port = new SerialPort(companionPort)
-                {
-                    DtrEnable = true,
-                    RtsEnable = true,
-                    ReadTimeout = 5000,
-                    WriteTimeout = 5000,
-                    BaudRate = 115200,
-                    StopBits = StopBits.One,
-                    Parity = Parity.None
-                };
-                port.Open();
-                port.DiscardInBuffer();
-                port.DiscardOutBuffer();
-
-                // Send Hello command to wake the device
-                var hello = new byte[] { 0x01, 0xef, 0x69, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xc5, 0xd3 };
-                var buffer = new byte[250];
-                Array.Copy(hello, buffer, hello.Length);
-                port.Write(buffer, 0, 250);
-
-                // Read response
-                var readBuf = new byte[1024];
-                try
-                {
-                    var read = port.Read(readBuf, 0, 24);
-                    Logger.Information("CT13INCH: Companion port responded with {Length} bytes", read);
-                }
-                catch (TimeoutException)
-                {
-                    Logger.Warning("CT13INCH: Companion port read timeout");
-                }
-
-                port.Close();
-                Logger.Information("CT13INCH: Companion port initialized successfully");
-            }
-            catch (Exception ex)
-            {
-                Logger.Warning(ex, "CT13INCH: Failed to initialize companion port");
-            }
-        }
-
         protected override async Task DoWorkAsync(CancellationToken token)
         {
             await Task.Delay(300, token);
             try
             {
-                // For CT13INCH: initialize via SoC port before opening CH340 data port
-                if (_device.ModelInfo?.Model == TuringPanel.TuringPanelModel.REV_13INCH_USB)
-                {
-                    InitializeCompanionPort();
-                    await Task.Delay(500, token); // Give the device time to wake
-                }
-
                 using var screen = ScreenFactory.Create(_screenType, _device.DeviceLocation, _nativeWidth, _nativeHeight);
 
                 if (screen == null)
