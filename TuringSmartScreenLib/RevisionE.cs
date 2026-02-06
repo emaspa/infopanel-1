@@ -15,7 +15,7 @@ public sealed unsafe class TuringSmartScreenRevisionE : IDisposable
 
     private static readonly byte[] CommandHello = [0x01, 0xef, 0x69, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xc5, 0xd3];
     private static readonly byte[] CommandSetBrightness = [0x7b, 0xef, 0x69, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00];
-    private static readonly byte[] CommandDisplayBitmap = [0xc8, 0xef, 0x69, 0x00, 0x38, 0x40, 0x00];
+    private static readonly byte[] CommandDisplayBitmapPrefix = [0xc8, 0xef, 0x69, 0x00];
     private static readonly byte[] CommandPreUpdateBitmap = [0x86, 0xef, 0x69, 0x00, 0x00, 0x00, 0x01];
     private static readonly byte[] CommandUpdateBitmap = [0xcc, 0xef, 0x69, 0x00, 0x00];
     private static readonly byte[] CommandQueryStatus = [0xcf, 0xef, 0x69, 0x00, 0x00, 0x00, 0x01];
@@ -36,10 +36,20 @@ public sealed unsafe class TuringSmartScreenRevisionE : IDisposable
 
     public int Height { get; }
 
+    private readonly byte[] commandDisplayBitmap;
+
     public TuringSmartScreenRevisionE(string name, int width = 480, int height = 1920)
     {
         Width = width;
         Height = height;
+
+        var payloadSize = width * height * 4;
+        commandDisplayBitmap = [
+            .. CommandDisplayBitmapPrefix,
+            (byte)((payloadSize >> 16) & 0xff),
+            (byte)((payloadSize >> 8) & 0xff),
+            (byte)(payloadSize & 0xff)
+        ];
         port = new SerialPort(name)
         {
             DtrEnable = true,
@@ -195,7 +205,7 @@ public sealed unsafe class TuringSmartScreenRevisionE : IDisposable
         Flush(0x2c);
 
         // DisplayBitmap
-        Write(CommandDisplayBitmap);
+        Write(commandDisplayBitmap);
         Flush();
 
         // Payload
@@ -264,7 +274,7 @@ public sealed unsafe class TuringSmartScreenRevisionE : IDisposable
         Flush(0x2c);
 
         // DisplayBitmap
-        Write(CommandDisplayBitmap);
+        Write(commandDisplayBitmap);
         Flush();
 
         // Payload
