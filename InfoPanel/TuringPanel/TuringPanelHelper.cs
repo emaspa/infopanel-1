@@ -90,9 +90,8 @@ namespace InfoPanel.TuringPanel
                     var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort");
                     var serialPorts = searcher.Get().Cast<ManagementObject>().ToList();
 
-                    // Check for CT13INCH panel (VID_1A86&PID_CA11)
-                    // When present, the companion 0525:A4A7 port is NOT the display —
-                    // communication happens via the 1A86:CA11 port instead
+                    // Check for CT13INCH identifier port (VID_1A86&PID_CA11)
+                    // When present, the companion 0525:A4A7 port is a 13" panel, not an 8.8"
                     bool hasCt13Inch = serialPorts.Any(obj =>
                     {
                         string? pnp = obj["PNPDeviceID"]?.ToString();
@@ -101,7 +100,7 @@ namespace InfoPanel.TuringPanel
 
                     if (hasCt13Inch)
                     {
-                        Logger.Information("Detected CT13INCH panel — using 1A86:CA11 port for communication");
+                        Logger.Information("Detected CT13INCH identifier port");
                     }
 
                     foreach (ManagementObject queryObj in serialPorts)
@@ -113,9 +112,8 @@ namespace InfoPanel.TuringPanel
                             continue;
                         }
 
-                        // When CT13INCH is present, skip the companion 0525:A4A7 port
-                        // (it's the SoC serial interface, not the display communication port)
-                        if (hasCt13Inch && vid == 0x0525 && pid == 0xa4a7)
+                        // Skip CT13INCH identifier port — not used for communication
+                        if (vid == 0x1a86 && pid == 0xca11)
                         {
                             continue;
                         }
@@ -124,14 +122,21 @@ namespace InfoPanel.TuringPanel
                         {
                             if (kv.Value.VendorId == vid && kv.Value.ProductId == pid && !kv.Value.IsUsbDevice)
                             {
-                                var modelInfo = TuringPanelModelDatabase.Models[kv.Key];
+                                var model = kv.Key;
+                                // Override to 13" when CT13INCH is present
+                                if (hasCt13Inch && vid == 0x0525 && pid == 0xa4a7)
+                                {
+                                    model = TuringPanelModel.REV_13INCH_USB;
+                                }
+
+                                var modelInfo = TuringPanelModelDatabase.Models[model];
                                 Logger.Information("Found Turing panel device: {Name} on {ComPort}", modelInfo.Name, comPort);
 
                                 TuringPanelDevice device = new()
                                 {
                                     DeviceId = pnpDeviceId,
                                     DeviceLocation = comPort,
-                                    Model = kv.Key.ToString()
+                                    Model = model.ToString()
                                 };
 
                                 devices.Add(device);
