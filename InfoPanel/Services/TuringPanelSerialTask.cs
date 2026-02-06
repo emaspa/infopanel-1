@@ -75,8 +75,8 @@ namespace InfoPanel
                         break;
                     case TuringPanel.TuringPanelModel.REV_13INCH_USB:
                         _screenType = ScreenType.RevisionE;
-                        _nativeWidth = 1920;
-                        _nativeHeight = 440;
+                        _nativeWidth = 440;
+                        _nativeHeight = 1920;
                         _sectorWidth = 32;
                         _sectorHeight = 32;
                         _maxSectorWidth = 128;
