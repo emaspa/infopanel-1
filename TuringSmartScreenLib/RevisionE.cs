@@ -363,6 +363,16 @@ public sealed unsafe class TuringSmartScreenRevisionE : IDisposable
         Flush();
 
         var response = ReadResponse();
-        return response.StartsWith("needReSend:0"u8);
+        if (response.Length > 0)
+        {
+            LastPartialResponse = Convert.ToHexString(response);
+        }
+        // Succeed unless the SoC explicitly requests a resend
+        return !response.StartsWith("needReSend:1"u8);
     }
+
+    /// <summary>
+    /// Last raw response from a partial bitmap update (hex string for diagnostics).
+    /// </summary>
+    public string? LastPartialResponse { get; private set; }
 }
