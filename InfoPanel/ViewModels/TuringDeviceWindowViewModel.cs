@@ -218,6 +218,8 @@ public partial class TuringDeviceWindowViewModel : ObservableObject
         }
         catch (Exception ex)
         {
+            _serialDevice?.Dispose();
+            _serialDevice = null;
             Application.Current.Dispatcher.Invoke(() => DeviceStatus = "Failed to connect");
             ShowStatus("Connection Failed", $"Could not connect to serial device on {comPort}: {ex.Message}", InfoBarSeverity.Error);
         }
@@ -390,6 +392,10 @@ public partial class TuringDeviceWindowViewModel : ObservableObject
 
                     ShowStatus("Success", $"'{fileName}' uploaded successfully.", InfoBarSeverity.Success);
                     await RefreshStorage();
+                }
+                catch (TimeoutException ex)
+                {
+                    ShowStatus("Upload Failed", $"Upload timed out for '{fileName}': {ex.Message}. The device may need to be reconnected.", InfoBarSeverity.Error);
                 }
                 catch (TuringDeviceException ex)
                 {

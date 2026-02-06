@@ -95,16 +95,18 @@ public sealed unsafe class TuringSmartScreenRevisionE : IDisposable
         {
             try
             {
+                port.DiscardInBuffer();
+                port.DiscardOutBuffer();
+            }
+            catch { }
+
+            try
+            {
                 port.Close();
             }
-            catch (IOException)
-            {
-                // Ignore
-            }
-            catch (TargetInvocationException)
-            {
-                // Ignore
-            }
+            catch (IOException) { }
+            catch (TargetInvocationException) { }
+            catch (UnauthorizedAccessException) { }
         }
     }
 
@@ -483,11 +485,38 @@ public sealed unsafe class TuringSmartScreenRevisionE : IDisposable
             throw new IOException($"CreateFile failed: {createResponse}");
         }
 
-        // Write raw file data directly to the serial port (not 250-byte framed)
-        port.Write(fileData, 0, fileData.Length);
+        // Temporarily increase write timeout for large file transfers.
+        // At 115200 baud, effective throughput is ~11.5KB/s.
+        // Use ~5KB/s estimate with a 30s minimum for safety margin.
+        var originalWriteTimeout = port.WriteTimeout;
+        var originalReadTimeout = port.ReadTimeout;
+        try
+        {
+            port.WriteTimeout = Math.Max(30000, fileData.Length / 5);
+            port.ReadTimeout = Math.Max(10000, originalReadTimeout);
 
-        // Read completion response
-        ReadStringResponse(32);
+            // Write raw file data directly to the serial port (not 250-byte framed)
+            port.Write(fileData, 0, fileData.Length);
+
+            // Read completion response
+            ReadStringResponse(32);
+        }
+        catch
+        {
+            // On failure, try to recover port state
+            try
+            {
+                port.DiscardInBuffer();
+                port.DiscardOutBuffer();
+            }
+            catch { }
+            throw;
+        }
+        finally
+        {
+            port.WriteTimeout = originalWriteTimeout;
+            port.ReadTimeout = originalReadTimeout;
+        }
     }
 
     public void StopMedia()
