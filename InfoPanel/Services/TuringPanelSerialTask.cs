@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using TuringSmartScreenLib;
 using TuringSmartScreenLib.Helpers.SkiaSharp;
 using System.Diagnostics;
+using System.IO.Ports;
 
 namespace InfoPanel
 {
@@ -116,6 +117,32 @@ namespace InfoPanel
         protected override async Task DoWorkAsync(CancellationToken token)
         {
             await Task.Delay(300, token);
+
+            // Diagnostic: test if the CH340 data port (1A86:CA11) is accessible from this process
+            if (_device.ModelInfo?.Model == TuringPanel.TuringPanelModel.REV_13INCH_USB)
+            {
+                var ch340Port = TuringPanel.TuringPanelHelper.FindCompanionPort(0x1a86, 0xca11);
+                if (ch340Port != null)
+                {
+                    Logger.Information("CT13INCH: Found CH340 data port at {Port}, testing accessibility...", ch340Port);
+                    try
+                    {
+                        using var testPort = new SerialPort(ch340Port, 115200);
+                        testPort.Open();
+                        Logger.Information("CT13INCH: Successfully opened {Port} from InfoPanel process", ch340Port);
+                        testPort.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warning(ex, "CT13INCH: Failed to open {Port} from InfoPanel process", ch340Port);
+                    }
+                }
+                else
+                {
+                    Logger.Warning("CT13INCH: CH340 data port (1A86:CA11) not found");
+                }
+            }
+
             try
             {
                 using var screen = ScreenFactory.Create(_screenType, _device.DeviceLocation, _nativeWidth, _nativeHeight);
