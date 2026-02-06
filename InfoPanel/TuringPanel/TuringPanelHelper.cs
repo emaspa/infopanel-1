@@ -92,21 +92,15 @@ namespace InfoPanel.TuringPanel
 
                     // Check for CT13INCH identifier port (VID_1A86&PID_CA11)
                     // When present, the companion 0525:A4A7 port is a 10.2" panel, not an 8.8"
-                    // The CH340 port (CA11) is the fast hardware serial data path
-                    string? ct13InchPort = null;
-                    foreach (ManagementObject obj in serialPorts)
+                    bool hasCt13Inch = serialPorts.Any(obj =>
                     {
                         string? pnp = obj["PNPDeviceID"]?.ToString();
-                        if (pnp != null && pnp.Contains("VID_1A86") && pnp.Contains("PID_CA11"))
-                        {
-                            ct13InchPort = obj["DeviceID"]?.ToString();
-                            break;
-                        }
-                    }
+                        return pnp != null && pnp.Contains("VID_1A86") && pnp.Contains("PID_CA11");
+                    });
 
-                    if (ct13InchPort != null)
+                    if (hasCt13Inch)
                     {
-                        Logger.Information("Detected CT13INCH CH340 data port at {Port}", ct13InchPort);
+                        Logger.Information("Detected CT13INCH identifier port");
                     }
 
                     foreach (ManagementObject queryObj in serialPorts)
@@ -118,7 +112,7 @@ namespace InfoPanel.TuringPanel
                             continue;
                         }
 
-                        // Skip CT13INCH CH340 port — used as data port, not matched directly
+                        // Skip CT13INCH CH340 port from normal matching
                         if (vid == 0x1a86 && pid == 0xca11)
                         {
                             continue;
@@ -129,23 +123,19 @@ namespace InfoPanel.TuringPanel
                             if (kv.Value.VendorId == vid && kv.Value.ProductId == pid && !kv.Value.IsUsbDevice)
                             {
                                 var model = kv.Key;
-                                var deviceLocation = comPort;
-
-                                // Override to 10.2" when CT13INCH is present, use CH340 for data
-                                if (ct13InchPort != null && vid == 0x0525 && pid == 0xa4a7)
+                                // Override to 10.2" when CT13INCH is present
+                                if (hasCt13Inch && vid == 0x0525 && pid == 0xa4a7)
                                 {
                                     model = TuringPanelModel.REV_13INCH_USB;
-                                    deviceLocation = ct13InchPort;
-                                    Logger.Information("CT13INCH: Using CH340 data port {Ch340Port} instead of CDC ACM port {CdcPort}", ct13InchPort, comPort);
                                 }
 
                                 var modelInfo = TuringPanelModelDatabase.Models[model];
-                                Logger.Information("Found Turing panel device: {Name} on {ComPort}", modelInfo.Name, deviceLocation);
+                                Logger.Information("Found Turing panel device: {Name} on {ComPort}", modelInfo.Name, comPort);
 
                                 TuringPanelDevice device = new()
                                 {
                                     DeviceId = pnpDeviceId,
-                                    DeviceLocation = deviceLocation,
+                                    DeviceLocation = comPort,
                                     Model = model.ToString()
                                 };
 

@@ -119,13 +119,34 @@ namespace InfoPanel
 
             try
             {
-                using var screen = ScreenFactory.Create(_screenType, _device.DeviceLocation, _nativeWidth, _nativeHeight);
+                // For CT13INCH, try the fast CH340 port first, fall back to CDC ACM
+                IScreen? screen = null;
+                if (_device.ModelInfo?.Model == TuringPanel.TuringPanelModel.REV_13INCH_USB)
+                {
+                    var ch340Port = TuringPanel.TuringPanelHelper.FindCompanionPort(0x1a86, 0xca11);
+                    if (ch340Port != null)
+                    {
+                        try
+                        {
+                            screen = ScreenFactory.Create(_screenType, ch340Port, _nativeWidth, _nativeHeight);
+                            Logger.Information("CT13INCH: Connected via CH340 data port {Port}", ch340Port);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Warning(ex, "CT13INCH: CH340 port {Port} failed, falling back to CDC ACM port {FallbackPort}", ch340Port, _device.DeviceLocation);
+                        }
+                    }
+                }
+
+                screen ??= ScreenFactory.Create(_screenType, _device.DeviceLocation, _nativeWidth, _nativeHeight);
 
                 if (screen == null)
                 {
                     Logger.Warning("TuringPanelE: Screen not found on port {Port}", _device.DeviceLocation);
                     return;
                 }
+
+                using var _ = screen;
 
                 screen.Orientation = _screenOrientation;
                 _device.UpdateRuntimeProperties(isRunning: true);
