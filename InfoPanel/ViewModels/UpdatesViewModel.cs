@@ -9,6 +9,7 @@ namespace InfoPanel.ViewModels
     public class UpdatesViewModel : ObservableObject
     {
         public string Version { get; set; }
+        public string NumericVersion { get; set; }
 
         public VersionModel? VersionModel { get; set; }
 
@@ -48,7 +49,8 @@ namespace InfoPanel.ViewModels
         {
             var assembly = Assembly.GetExecutingAssembly();
             var buildTime = File.GetLastWriteTime(assembly.Location);
-            Version = $"{assembly.GetName().Version!.ToString(3)} Experimental {buildTime:dd MMM yyyy HH:mm}";
+            NumericVersion = assembly.GetName().Version!.ToString(3);
+            Version = $"{NumericVersion} Experimental {buildTime:dd MMM yyyy HH:mm}";
 
             var version128 = new UpdateVersion()
             {

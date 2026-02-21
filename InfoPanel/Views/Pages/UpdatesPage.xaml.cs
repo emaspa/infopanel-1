@@ -48,7 +48,7 @@ namespace InfoPanel.Views.Pages
 
             await Task.Delay(500);
 
-            if (IsNewerVersionAvailable(ViewModel.Version, latestVersion.Version))
+            if (IsNewerVersionAvailable(ViewModel.NumericVersion, latestVersion.Version))
             {
                 ViewModel.VersionModel = latestVersion;
                 ViewModel.UpdateAvailable = true;
