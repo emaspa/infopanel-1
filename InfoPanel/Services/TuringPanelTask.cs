@@ -47,7 +47,6 @@ namespace InfoPanel.Services
                     case TuringPanelModel.TURING_3_5:
                     case TuringPanelModel.REV_2INCH:
                     case TuringPanelModel.REV_5INCH:
-                    case TuringPanelModel.REV_5INCH_E:
                     case TuringPanelModel.REV_8INCH:
                     case TuringPanelModel.REV_13INCH_USB:
                         deviceTask = new TuringPanelSerialTask(device);

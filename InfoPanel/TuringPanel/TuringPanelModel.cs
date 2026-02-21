@@ -21,9 +21,6 @@
         REV_16INCH_USB,
         REV_21INCH_USB,
 
-        // Truz 5 inch panel (CT21INCH companion, RevisionE)
-        REV_5INCH_E,
-
         // TURZX 13 inch panel (CT13INCH)
         REV_13INCH_USB,
 

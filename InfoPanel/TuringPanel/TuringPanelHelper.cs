@@ -142,11 +142,6 @@ namespace InfoPanel.TuringPanel
                                     model = TuringPanelModel.REV_13INCH_USB;
                                 }
 
-                                // Override to Truz 5" (RevisionE) when CT21INCH is present
-                                if (hasCt21Inch && vid == 0x1d6b && pid == 0x0106)
-                                {
-                                    model = TuringPanelModel.REV_5INCH_E;
-                                }
 
                                 var modelInfo = TuringPanelModelDatabase.Models[model];
                                 Logger.Information("Found Turing panel device: {Name} on {ComPort}", modelInfo.Name, comPort);
