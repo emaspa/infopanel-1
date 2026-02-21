@@ -103,6 +103,19 @@ namespace InfoPanel.TuringPanel
                         Logger.Information("Detected CT13INCH identifier port");
                     }
 
+                    // Check for CT21INCH identifier port (VID_1A86&PID_CA21)
+                    // When present, the companion 1D6B:0106 port is a Truz 5" (RevisionE), not a Turing 5" (RevisionC)
+                    bool hasCt21Inch = serialPorts.Any(obj =>
+                    {
+                        string? pnp = obj["PNPDeviceID"]?.ToString();
+                        return pnp != null && pnp.Contains("VID_1A86") && pnp.Contains("PID_CA21");
+                    });
+
+                    if (hasCt21Inch)
+                    {
+                        Logger.Information("Detected CT21INCH identifier port");
+                    }
+
                     foreach (ManagementObject queryObj in serialPorts)
                     {
                         string? comPort = queryObj["DeviceID"]?.ToString();
@@ -112,8 +125,8 @@ namespace InfoPanel.TuringPanel
                             continue;
                         }
 
-                        // Skip CT13INCH CH340 port from normal matching
-                        if (vid == 0x1a86 && pid == 0xca11)
+                        // Skip CT13INCH/CT21INCH CH340 companion ports from normal matching
+                        if (vid == 0x1a86 && (pid == 0xca11 || pid == 0xca21))
                         {
                             continue;
                         }
@@ -127,6 +140,12 @@ namespace InfoPanel.TuringPanel
                                 if (hasCt13Inch && vid == 0x0525 && pid == 0xa4a7)
                                 {
                                     model = TuringPanelModel.REV_13INCH_USB;
+                                }
+
+                                // Override to Truz 5" (RevisionE) when CT21INCH is present
+                                if (hasCt21Inch && vid == 0x1d6b && pid == 0x0106)
+                                {
+                                    model = TuringPanelModel.REV_5INCH_E;
                                 }
 
                                 var modelInfo = TuringPanelModelDatabase.Models[model];

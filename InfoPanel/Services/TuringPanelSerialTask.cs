@@ -64,6 +64,14 @@ namespace InfoPanel
                         _maxSectorHeight = 80;
                         _maxSectors = 30;
                         break;
+                    case TuringPanel.TuringPanelModel.REV_5INCH_E:
+                        _screenType = ScreenType.RevisionE;
+                        _sectorWidth = 32;
+                        _sectorHeight = 32;
+                        _maxSectorWidth = 128;
+                        _maxSectorHeight = 96;
+                        _maxSectors = 38;
+                        break;
                     case TuringPanel.TuringPanelModel.REV_8INCH:
                     case TuringPanel.TuringPanelModel.REV_2INCH:
                         _screenType = ScreenType.RevisionE;
