@@ -161,8 +161,14 @@ public partial class UsbPanelsPage : Page
                 }
                 else
                 {
-                    //update location
+                    //update location and model (companion port detection may refine the model)
                     device.DeviceLocation = discoveredDevice.DeviceLocation;
+                    if (device.Model != discoveredDevice.Model)
+                    {
+                        Logger.Information("TuringPanel Discovery: Device '{DeviceId}' model updated from {OldModel} to {NewModel}",
+                            discoveredDevice.DeviceId, device.Model, discoveredDevice.Model);
+                        device.Model = discoveredDevice.Model;
+                    }
                     Logger.Information("TuringPanel Discovery: Device with DeviceId '{DeviceId}' already exists", discoveredDevice.DeviceId);
                 }
             });
