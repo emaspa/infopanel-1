@@ -996,10 +996,32 @@ namespace InfoPanel.Services
                 Logger.Warning("ThermalrightPanelDevice {Device}: No TrofeoBulk response (ec={Error}), continuing anyway", _device, readEc);
             }
 
-            // Re-identify model variant based on device-reported resolution.
+            // Re-identify model variant based on byte[20] discriminator + reported resolution.
+            // All 0x5408 panels share the same VID/PID but report different byte[20] values:
+            //   byte[20]=0x01: 9.16" v1   (firmware reports 480, framebuffer is 462 — flicker fix crops)
+            //   byte[20]<=3:   9.16" v2   (firmware reports 599 — see TRCC pm=65 path)
+            //   byte[20]=0x05: 11.3"      (firmware reports 480, actual panel is 1920x400)
+            byte? trofeoB20 = readBytes >= 21 ? (byte?)responseBuffer[20] : null;
+
+            if (trofeoB20 == 0x05
+                && ThermalrightPanelModelDatabase.Models.TryGetValue(ThermalrightPanelModel.TrofeoVision113, out var v113Model))
+            {
+                _detectedModel = v113Model;
+                _device.Model = v113Model.Model;
+                _panelWidth = v113Model.RenderWidth;
+                _panelHeight = v113Model.RenderHeight;
+                Logger.Information("ThermalrightPanelDevice {Device}: byte[20]=0x05 detected as Trofeo Vision 11.3\" ({Width}x{Height})",
+                    _device, _panelWidth, _panelHeight);
+            }
+            // On restart, model is already 11.3" but device still reports 480. Override to model's render size.
+            else if (_device.Model == ThermalrightPanelModel.TrofeoVision113 && _device.ModelInfo != null)
+            {
+                _panelWidth = _device.ModelInfo.RenderWidth;
+                _panelHeight = _device.ModelInfo.RenderHeight;
+            }
             // v1 (480) and v2 (599) share the same VID/PID but have different panels.
             // TRCC forces 462 for all 5408 variants (byte[20] <= 3 -> pm=65 -> 1920x462).
-            if (_panelHeight != 480 && _device.Model == ThermalrightPanelModel.TrofeoVision916
+            else if (_panelHeight != 480 && _device.Model == ThermalrightPanelModel.TrofeoVision916
                 && ThermalrightPanelModelDatabase.Models.TryGetValue(ThermalrightPanelModel.TrofeoVision916V2, out var v2Model))
             {
                 _detectedModel = v2Model;
@@ -1019,7 +1041,8 @@ namespace InfoPanel.Services
             // Some panel units have a 462-row framebuffer; sending 480-height JPEGs overflows
             // by 18 rows, wrapping to the top of the display.
             // Flicker fix is toggled live via _device.FlickerFix, checked each frame in GenerateJpegBuffer.
-            if (_panelHeight == 480)
+            // Skip for 11.3" — that panel has its own 400-row target, not a 462 crop.
+            if (_panelHeight == 480 && _device.Model != ThermalrightPanelModel.TrofeoVision113)
             {
                 _flickerFixCropHeight = 462;
             }

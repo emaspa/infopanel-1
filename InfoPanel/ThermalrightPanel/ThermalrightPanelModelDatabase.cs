@@ -224,6 +224,21 @@ namespace InfoPanel.ThermalrightPanel
                 TransportType = ThermalrightTransportType.WinUsb,
                 ProtocolType = ThermalrightProtocolType.TrofeoBulk
             },
+            // 11.3" is NOT in the VID/PID lookup (same PID 0x5408 as 9.16").
+            // Detected at runtime by byte[20]=0x05 in the TrofeoBulk init response.
+            // Device firmware still reports 1920x480 but the actual panel is 1920x400.
+            [ThermalrightPanelModel.TrofeoVision113] = new ThermalrightPanelModelInfo
+            {
+                Model = ThermalrightPanelModel.TrofeoVision113,
+                Name = "Trofeo Vision 11.3\"",
+                DeviceIdentifier = "",
+                Width = 1920,
+                Height = 400,
+                RenderWidth = 1920,
+                RenderHeight = 400,
+                TransportType = ThermalrightTransportType.WinUsb,
+                ProtocolType = ThermalrightProtocolType.TrofeoBulk
+            },
             [ThermalrightPanelModel.TrofeoVision320] = new ThermalrightPanelModelInfo
             {
                 Model = ThermalrightPanelModel.TrofeoVision320,
