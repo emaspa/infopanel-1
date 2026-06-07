@@ -1019,8 +1019,11 @@ namespace InfoPanel.Services
                 _panelWidth = _device.ModelInfo.RenderWidth;
                 _panelHeight = _device.ModelInfo.RenderHeight;
             }
-            // v1 (480) and v2 (599) share the same VID/PID but have different panels.
-            // TRCC forces 462 for all 5408 variants (byte[20] <= 3 -> pm=65 -> 1920x462).
+            // v1 (reports 480) and v2 (reports 599) share the same VID/PID but report
+            // different heights. They are the same physical 9.16" panel, so v2 renders at
+            // the same 1920x480 default as v1 (overriding the bogus 599 the firmware reports;
+            // sending 599-height JPEGs is stretched). Flicker fix then crops to 462 if the
+            // user's unit needs it — identical opt-in behavior to v1.
             else if (_panelHeight != 480 && _device.Model == ThermalrightPanelModel.TrofeoVision916
                 && ThermalrightPanelModelDatabase.Models.TryGetValue(ThermalrightPanelModel.TrofeoVision916V2, out var v2Model))
             {
@@ -1036,11 +1039,12 @@ namespace InfoPanel.Services
                 _panelHeight = _device.ModelInfo.RenderHeight;
             }
 
-            // TRCC sends 1920x462 JPEGs for v1, NOT 1920x480 as reported by the device.
-            // The JPEG SOF0 in USB captures confirms height=0x01CE=462.
-            // Some panel units have a 462-row framebuffer; sending 480-height JPEGs overflows
-            // by 18 rows, wrapping to the top of the display.
-            // Flicker fix is toggled live via _device.FlickerFix, checked each frame in GenerateJpegBuffer.
+            // Both 9.16" v1 and v2 render at 1920x480 by default. Some units have a 462-row
+            // framebuffer; sending 480-height JPEGs overflows by 18 rows and wraps to the top
+            // of the display (TRCC works around this by always sending 462 — JPEG SOF0 in USB
+            // captures confirms height=0x01CE=462). We default to the full 480 and let the user
+            // enable the Flicker Fix toggle to crop to 462 if their unit shows the overflow.
+            // Flicker fix is checked live each frame in GenerateJpegBuffer.
             // Skip for 11.3" — that panel has its own 400-row target, not a 462 crop.
             if (_panelHeight == 480 && _device.Model != ThermalrightPanelModel.TrofeoVision113)
             {

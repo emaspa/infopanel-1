@@ -217,10 +217,12 @@ namespace InfoPanel.ThermalrightPanel
                 Model = ThermalrightPanelModel.TrofeoVision916V2,
                 Name = "Trofeo Vision 9.16\" v2",
                 DeviceIdentifier = "",
+                // Same physical 9.16" panel as v1; firmware just reports 599 instead of 480.
+                // Render at the v1 default (480), Flicker Fix crops to 462 if the unit needs it.
                 Width = 1920,
-                Height = 462,
+                Height = 480,
                 RenderWidth = 1920,
-                RenderHeight = 462,
+                RenderHeight = 480,
                 TransportType = ThermalrightTransportType.WinUsb,
                 ProtocolType = ThermalrightProtocolType.TrofeoBulk
             },
