@@ -78,9 +78,10 @@ namespace InfoPanel.ThermalrightPanel
         public const string IDENTIFIER_V3 = "SSCRM-V3"; // Wonder / Rainbow Vision 360 (2400x1080) — SUB byte differentiates
 
         // SUB byte (init response byte[28]) for SSCRM-V3 models
-        public const byte WONDER_360_SUB_BYTE  = 0x01; // Wonder Vision 360
-        public const byte RAINBOW_360_SUB_BYTE = 0x02; // Rainbow Vision 360
-        public const byte LEVITA_360_SUB_BYTE  = 0x03; // Levita Vision 360
+        public const byte WONDER_360_SUB_BYTE    = 0x01; // Wonder Vision 360
+        public const byte RAINBOW_360_SUB_BYTE   = 0x02; // Rainbow Vision 360
+        public const byte LEVITA_360_SUB_BYTE    = 0x03; // Levita Vision 360
+        public const byte WONDER_360_V2_SUB_BYTE = 0x20; // Wonder Vision 360 v2 (newer firmware batch, PM=0x07)
         public const string IDENTIFIER_V4 = "SSCRM-V4"; // TL-M10 Vision (1920x462)
         public const string IDENTIFIER_SPI_V2 = "SPISCRM-V2"; // Elite Vision 360 ARGB Black (SPI 320x320, RGB565 LE)
 
@@ -110,6 +111,22 @@ namespace InfoPanel.ThermalrightPanel
                 VendorId = THERMALRIGHT_VENDOR_ID,
                 ProductId = THERMALRIGHT_PRODUCT_ID,
                 SubByte = WONDER_360_SUB_BYTE
+            },
+            // Wonder Vision 360 v2: same physical 6.67" 2400x1080 panel, newer firmware reports
+            // SSCRM-V3 with SUB=0x20 (and PM=0x07). The strict identifier+SUB detection pass picks
+            // this up before the PM+SUB table would mis-route PM=7 to the 640x480 Stream Vision entry.
+            [ThermalrightPanelModel.WonderVision360V2] = new ThermalrightPanelModelInfo
+            {
+                Model = ThermalrightPanelModel.WonderVision360V2,
+                Name = "Wonder Vision 360 6.67\" v2",
+                DeviceIdentifier = IDENTIFIER_V3,
+                Width = 2400,
+                Height = 1080,
+                RenderWidth = 1600,  // Same panel/render size as Wonder Vision 360
+                RenderHeight = 720,
+                VendorId = THERMALRIGHT_VENDOR_ID,
+                ProductId = THERMALRIGHT_PRODUCT_ID,
+                SubByte = WONDER_360_V2_SUB_BYTE
             },
             [ThermalrightPanelModel.RainbowVision360] = new ThermalrightPanelModelInfo
             {

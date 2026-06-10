@@ -7,6 +7,8 @@ namespace InfoPanel.ThermalrightPanel
         PeerlessVision360,
         // Wonder Vision 360 - 6.67" (2400x1080) - responds with SSCRM-V3, SUB=0x01
         WonderVision360,
+        // Wonder Vision 360 v2 - 6.67" (2400x1080) - responds with SSCRM-V3, SUB=0x20, PM=0x07. Same panel, newer firmware batch.
+        WonderVision360V2,
         // Rainbow Vision 360 - 6.67" (2400x1080) - responds with SSCRM-V3, SUB=0x02
         RainbowVision360,
         // Levita Vision 360 - 6.67" (2400x1080) - responds with SSCRM-V3, SUB=0x03
