@@ -502,6 +502,17 @@ namespace InfoPanel
                     await ThermaltakePanelTask.Instance.StopAsync();
                 }
             }
+            else if (e.PropertyName == nameof(Settings.JonsboPanelMultiDeviceMode))
+            {
+                if (Settings.JonsboPanelMultiDeviceMode)
+                {
+                    await JonsboPanelTask.Instance.StartAsync();
+                }
+                else
+                {
+                    await JonsboPanelTask.Instance.StopAsync();
+                }
+            }
 
             await SaveSettingsAsync();
         }
@@ -711,6 +722,15 @@ namespace InfoPanel
                             foreach (var device in settings.ThermaltakePanelDevices)
                             {
                                 Settings.ThermaltakePanelDevices.Add(device);
+                            }
+
+                            // Load Jonsbo panel settings
+                            Settings.JonsboPanelMultiDeviceMode = settings.JonsboPanelMultiDeviceMode;
+
+                            Settings.JonsboPanelDevices.Clear();
+                            foreach (var device in settings.JonsboPanelDevices)
+                            {
+                                Settings.JonsboPanelDevices.Add(device);
                             }
 
                             // Load hotkey bindings
