@@ -14,6 +14,17 @@
 
 ![build status](https://github.com/habibrehmansg/infopanel/actions/workflows/dotnet-desktop.yml/badge.svg?branch=main) 
 
+## InfoPanel for Linux
+
+A native Linux rebuild of InfoPanel is available at
+[emaspa/InfoPanel-linux](https://github.com/emaspa/InfoPanel-linux): desktop
+overlays, USB LCD panels (including the Thermalright families this fork
+adds) and a web viewer, built on .NET 10 and Avalonia. Profiles, settings
+and plugins are two-way compatible with this Windows build, so a data
+folder written by one app loads in the other. Arch users can install it
+from the AUR (`infopanel-bin`); tarballs for any distribution are on its
+releases page.
+
 ## Features
 
 - **Multiple Data Sources**: 
