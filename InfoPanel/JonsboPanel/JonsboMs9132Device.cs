@@ -128,6 +128,10 @@ namespace InfoPanel.JonsboPanel
 
         /// <summary>
         /// Applies the captured OEM mode-set sequence for the given native resolution and VIC.
+        /// The delays are load-bearing: the chip takes ~100 ms to process power-on and
+        /// silently drops commands sent while busy, leaving the bulk pipe NAKing every
+        /// frame (verified on real DS339 hardware - back-to-back writes lose "video on",
+        /// which shows as an endless open / mode-set / IoTimedOut / power-cycle loop).
         /// </summary>
         public void SetMode(int width, int height, byte vic)
         {
@@ -135,13 +139,19 @@ namespace InfoPanel.JonsboPanel
             byte hHi = (byte)(height >> 8), hLo = (byte)(height & 0xFF);
 
             WriteControl([0xA6, 0x07, 0x01, 0x02, 0, 0, 0, 0]);   // power on
+            Thread.Sleep(150);
             WriteControl([0xA6, 0x05, 0x00, 0, 0, 0, 0, 0]);      // video off
+            Thread.Sleep(30);
             WriteControl([0xA6, 0x03, 0x03, 0, 0, 0, 0, 0]);
+            Thread.Sleep(30);
             WriteControl([0xA6, 0x01, wHi, wLo, hHi, hLo, 0x11, 0x00]); // in: RGB888
+            Thread.Sleep(30);
             WriteControl([0xA6, 0x02, vic, 0x00, wHi, wLo, hHi, hLo]);  // out: VIC
+            Thread.Sleep(30);
             WriteControl([0xA6, 0x04, 0x01, 0, 0, 0, 0, 0]);
+            Thread.Sleep(30);
             WriteControl([0xA6, 0x05, 0x01, 0, 0, 0, 0, 0]);      // video on
-            Thread.Sleep(100);
+            Thread.Sleep(200);
 
             Logger.Information("JonsboMs9132: Mode set {Width}x{Height} VIC {Vic}", width, height, vic);
         }
