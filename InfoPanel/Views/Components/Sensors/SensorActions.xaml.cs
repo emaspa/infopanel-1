@@ -70,6 +70,16 @@ namespace InfoPanel.Views.Components
                         };
                         SharedModel.Instance.AddDisplayItem(item);
                     }
+                    else if (SelectedSensorItem is LibreHardwareTreeItem hardwareItem)
+                    {
+                        var textItem = new TextDisplayItem(hardwareItem.Name, selectedProfile)
+                        {
+                            Font = selectedProfile.Font,
+                            FontSize = selectedProfile.FontSize,
+                            Color = selectedProfile.Color
+                        };
+                        SharedModel.Instance.AddDisplayItem(textItem);
+                    }
                     break;
 
                 case SensorType.Plugin:

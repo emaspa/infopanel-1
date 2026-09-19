@@ -37,7 +37,7 @@ namespace InfoPanel.ViewModels.Components
         }
     }
 
-    public partial class LibreHardwareTreeItem : TreeItem 
+    public partial class LibreHardwareTreeItem : SensorTreeItem
     {
         public LibreHardwareTreeItem(object id, string name, LibreHardwareMonitor.Hardware.HardwareType hardwareType) : base(id, name)
         {
@@ -65,6 +65,10 @@ namespace InfoPanel.ViewModels.Components
                 HardwareType.Battery => "battery.png",
                 _ => "empty.png",
             };
+        }
+
+        public override void Update()
+        {
         }
     }
 
