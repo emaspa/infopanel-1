@@ -242,7 +242,7 @@
 		<PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
 		<PackageReference Include="HidSharp" Version="2.6.4" />
 		<PackageReference Include="ini-parser-netstandard" Version="2.5.3" />
-		<PackageReference Include="LibreHardwareMonitorLib" Version="0.9.7-pre726" />
+		<PackageReference Include="LibreHardwareMonitorLib" Version="0.9.7-pre742" />
 		<PackageReference Include="LibUsbDotNet" Version="2.2.75" />
 		<PackageReference Include="MahApps.Metro" Version="2.4.11" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.6" />
@@ -259,8 +259,8 @@
 		<PackageReference Include="SkiaSharp" Version="3.119.2" />
 		<PackageReference Include="Svg.Skia" Version="4.3.0" />
 		<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="10.0.6" />
-		<PackageReference Include="System.Management" Version="10.0.11" />
-		<PackageReference Include="System.IO.Ports" Version="10.0.11" />
+		<PackageReference Include="System.Management" Version="10.0.12" />
+		<PackageReference Include="System.IO.Ports" Version="10.0.12" />
 		<PackageReference Include="TaskScheduler" Version="2.12.2" />
 		<PackageReference Include="Topten.RichTextKit" Version="0.4.167" />
 		<PackageReference Include="WPF-UI" Version="4.2.0" />
