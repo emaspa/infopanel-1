@@ -8,7 +8,7 @@
 
 <br />
 
-[Releases][release] | [Issues][issues] | [User Guide](docs/USER_GUIDE.md) | [Panel Guide](PANELS.md) | [InfoPanel for Linux][linux]
+[Releases][release] | [Discord][discord] | [Issues][issues] | [User Guide](docs/USER_GUIDE.md) | [Panel Guide](PANELS.md) | [InfoPanel for Linux][linux]
 
 ![build status](https://github.com/emaspa/infopanel-1/actions/workflows/dotnet-desktop.yml/badge.svg?branch=all-changes)
 
@@ -53,7 +53,7 @@ This fork keeps InfoPanel moving: it merges the pending work, adds support for n
 
 Download the latest build from the [releases page][release]. The Microsoft Store and infopanel.net versions are the original upstream builds and do not include the changes above.
 
-Found a bug or have a panel that does not work? Open an [issue][issues]. For panels that are not detected, a log from startup helps a lot.
+Found a bug or have a panel that does not work? Open an [issue][issues]. For panels that are not detected, a log from startup helps a lot. For questions and help with setting up your panels, join the [Discord][discord].
 
 On Linux, use [InfoPanel for Linux][linux], a native port that shares profiles and plugins with this fork.
 
@@ -163,6 +163,7 @@ References
 
 [release]: https://github.com/emaspa/infopanel-1/releases
 [issues]: https://github.com/emaspa/infopanel-1/issues
+[discord]: https://discord.gg/aNGeJxjE7Q
 [upstream]: https://github.com/habibrehmansg/infopanel
 [linux]: https://github.com/emaspa/InfoPanel-linux
 [license]: https://github.com/emaspa/infopanel-1/blob/all-changes/LICENSE
