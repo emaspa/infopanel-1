@@ -1,20 +1,61 @@
-# InfoPanel
+# InfoPanel (maintained fork)
 
 <p align=center>
-  <a href="https://www.infopanel.net">
-    <img src="Images/logo.png" width=60/>
-  </a>
+  <img src="Images/logo.png" width=60/>
 </p>
 
-<p align=center>InfoPanel is a powerful desktop visualization software that transforms how you monitor your system. It displays hardware information on your desktop or external displays as sensor panels, with special support for USB LCD panels like BeadaPanel and Turing Smart Screen/Turzx.</span>
+<p align=center>Hardware monitoring panels for your desktop, external monitors and USB LCD screens, driven by HWiNFO and LibreHardwareMonitor. This is a maintained fork of <a href="https://github.com/habibrehmansg/infopanel">InfoPanel</a> with support for many more USB displays and a steady stream of fixes.</p>
 
 <br />
 
-[Releases][release] | [Reddit][reddit] | [Website][website] | [HWiNFO Forum][forum] | [Discord][discord] | [Microsoft Store][msstore]
+[Releases][release] | [Issues][issues] | [User Guide](docs/USER_GUIDE.md) | [Panel Guide](PANELS.md) | [InfoPanel for Linux][linux]
 
 ![build status](https://github.com/emaspa/infopanel-1/actions/workflows/dotnet-desktop.yml/badge.svg?branch=all-changes)
 
-> **Maintained fork.** This is a community-maintained fork of [habibrehmansg/infopanel](https://github.com/habibrehmansg/infopanel), which has not been updated in several months. It includes all upstream work plus extra display support and bug fixes. Report problems in this repository's [issues](https://github.com/emaspa/infopanel-1/issues). Builds are on the [releases page][release]; the Microsoft Store and website versions are upstream builds without these changes.
+## What this is
+
+InfoPanel is a Windows app that turns sensor readings into custom dashboards. You design a layout of text, gauges, graphs, bars and images, then show it as a desktop overlay, on a spare monitor, or on a small USB LCD panel such as the ones built into many coolers and cases.
+
+This repository is a fork of [habibrehmansg/infopanel][upstream], the original project by Habib Rehman. It contains all of the upstream code plus the changes listed below. Profiles, settings and plugins are compatible in both directions, so you can switch between the two without losing your work.
+
+## Why this fork exists
+
+The original project has had no commits since April 2026, and over twenty pull requests are waiting there without review. Meanwhile, new USB displays keep shipping, and existing ones need protocol fixes that only get found by people running them.
+
+This fork keeps InfoPanel moving: it merges the pending work, adds support for new panels, and fixes bugs reported by users. If upstream becomes active again, changes from here can be offered back.
+
+## What is different from upstream
+
+**More USB displays**
+- Thermalright: Trofeo Vision 9.16" and 11.3", Elite Vision 360 ARGB Black, Wonder Vision 360 v2
+- Jonsbo: DS916, DS339 and other MacroSilicon MS9132-based displays, driven at the resolution the panel reports
+- Lian Li LCD panels
+- Jungle Leopard / Hongtai cooler displays
+- VMAX 4.6" display over direct USB
+
+**Fixes**
+- Frame size cap for HID Trofeo panels, which stops them freezing
+- Startup timeouts on Jonsbo DS339
+- Profile windows that could not be dragged under heavy load
+- Plugin actions going to a stale host connection
+
+**Features**
+- Thresholds on bars and graphs, and automatic scaling of sensor values and units
+- Multi-select editing: duplicate, reorder, delete, group by dragging, and axis lock with Shift
+- Display assignment in profile settings
+- Configurable refresh interval for URL images
+- Metric or imperial units in the Weather plugin
+- Bundled Stopwatch plugin with global hotkeys, and an OBS Monitor plugin
+- Newer LibreHardwareMonitor, including NVIDIA hotspot sensors
+- A [User Guide](docs/USER_GUIDE.md) linked from the Home page
+
+## Getting it
+
+Download the latest build from the [releases page][release]. The Microsoft Store and infopanel.net versions are the original upstream builds and do not include the changes above.
+
+Found a bug or have a panel that does not work? Open an [issue][issues]. For panels that are not detected, a log from startup helps a lot.
+
+On Linux, use [InfoPanel for Linux][linux], a native port that shares profiles and plugins with this fork.
 
 ## Features
 
@@ -47,7 +88,7 @@
 
 - All hardware sensors exposed by HWiNFO
 - CPU, GPU, RAM, storage, and network monitoring via LibreHardwareMonitor
-- BeadaPanel USB LCD panels (all models supported)
+- USB LCD panels from BeadaPanel, Turing Smart Screen/Turzx, Thermalright, Jonsbo, Lian Li, Jungle Leopard and more (see the [Panel Guide](PANELS.md))
 - TuringPanel/TURZX displays (Models A, C, and E)
 - Any standard monitor or display
 
@@ -56,7 +97,7 @@ For detailed information about supported panels and recommendations, see our [Di
 ## Usage
 
 1. Install either HWiNFO (with Shared Memory support enabled) or use the built-in LibreHardwareMonitor integration
-2. Download InfoPanel from the [releases page][release] (the [Microsoft Store][msstore] and [website][website] have the upstream build)
+2. Download InfoPanel from the [releases page][release]
 3. Configure your display profile with sensors, gauges, and visualizations
 4. Customize layouts with drag-and-drop interface
 5. Connect USB displays or position on your desktop
@@ -104,6 +145,10 @@ InfoPanel is built with C# and WPF for a modern Windows UI experience. The archi
 - High-performance graphics rendering for external displays
 - Cross-device synchronization
 
+## Credits
+
+InfoPanel was created by [Habib Rehman](https://github.com/habibrehmansg). This fork is maintained by [emaspa](https://github.com/emaspa). Thanks to everyone who contributed panel support, plugins and bug reports.
+
 ## License
 
 InfoPanel is licensed under GPL 3.0 - see the [license file][license] for details.
@@ -116,10 +161,8 @@ InfoPanel is not affiliated with HWiNFO. HWiNFO is a registered trademark of its
 References
 -->
 
-[reddit]: https://www.reddit.com/r/InfoPanel/
-[website]: https://www.infopanel.net
-[forum]: https://www.hwinfo.com/forum/threads/infopanel-desktop-visualisation-software.8673/
-[discord]: https://discord.gg/aNGeJxjE7Q
-[msstore]: https://apps.microsoft.com/store/detail/XPFP7C8H5446ZD
 [release]: https://github.com/emaspa/infopanel-1/releases
+[issues]: https://github.com/emaspa/infopanel-1/issues
+[upstream]: https://github.com/habibrehmansg/infopanel
+[linux]: https://github.com/emaspa/InfoPanel-linux
 [license]: https://github.com/emaspa/infopanel-1/blob/all-changes/LICENSE
