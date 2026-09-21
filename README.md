@@ -12,7 +12,9 @@
 
 [Releases][release] | [Reddit][reddit] | [Website][website] | [HWiNFO Forum][forum] | [Discord][discord] | [Microsoft Store][msstore]
 
-![build status](https://github.com/habibrehmansg/infopanel/actions/workflows/dotnet-desktop.yml/badge.svg?branch=main) 
+![build status](https://github.com/emaspa/infopanel-1/actions/workflows/dotnet-desktop.yml/badge.svg?branch=all-changes)
+
+> **Maintained fork.** This is a community-maintained fork of [habibrehmansg/infopanel](https://github.com/habibrehmansg/infopanel), which has not been updated in several months. It includes all upstream work plus extra display support and bug fixes. Report problems in this repository's [issues](https://github.com/emaspa/infopanel-1/issues). Builds are on the [releases page][release]; the Microsoft Store and website versions are upstream builds without these changes.
 
 ## Features
 
@@ -54,7 +56,7 @@ For detailed information about supported panels and recommendations, see our [Di
 ## Usage
 
 1. Install either HWiNFO (with Shared Memory support enabled) or use the built-in LibreHardwareMonitor integration
-2. Install InfoPanel from the [Microsoft Store][msstore] or the [website][website]
+2. Download InfoPanel from the [releases page][release] (the [Microsoft Store][msstore] and [website][website] have the upstream build)
 3. Configure your display profile with sensors, gauges, and visualizations
 4. Customize layouts with drag-and-drop interface
 5. Connect USB displays or position on your desktop
@@ -119,5 +121,5 @@ References
 [forum]: https://www.hwinfo.com/forum/threads/infopanel-desktop-visualisation-software.8673/
 [discord]: https://discord.gg/aNGeJxjE7Q
 [msstore]: https://apps.microsoft.com/store/detail/XPFP7C8H5446ZD
-[release]: https://github.com/habibrehmansg/infopanel/releases
-[license]: https://github.com/habibrehmansg/infopanel/blob/main/LICENSE
+[release]: https://github.com/emaspa/infopanel-1/releases
+[license]: https://github.com/emaspa/infopanel-1/blob/all-changes/LICENSE
